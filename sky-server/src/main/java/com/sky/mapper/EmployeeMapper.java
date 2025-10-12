@@ -1,5 +1,7 @@
 package com.sky.mapper;
 
+import com.github.pagehelper.Page;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -20,4 +22,9 @@ public interface EmployeeMapper {
     @Insert("insert into employee (name, username, password, phone, sex, id_number, status, create_time, update_time, create_user, update_user) VALUES " +
             "(#{name},#{username},#{password},#{phone},#{sex},#{idNumber},#{status},#{createTime},#{updateTime},#{createUser},#{updateUser})")
     void insert(Employee employee);
+
+    //TODO 这样写的作用是，(指XML文件内的内容)
+    // 在有模糊查询的时候可以进行模糊查询，即使没有使用任何查询也会将所有数据按创建时间降序排序，
+    // 而具体分页情况（如从第几条数据开始，每页有多少数据）则由之前写的PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize())决定
+    Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
 }
