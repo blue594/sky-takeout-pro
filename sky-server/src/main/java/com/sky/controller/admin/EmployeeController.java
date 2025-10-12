@@ -70,6 +70,9 @@ public class EmployeeController {
     @PostMapping
     @ApiOperation("新增员工")
     public Result save(@RequestBody EmployeeDTO employeeDTO){
+        //此处的@RequestBody代表从前端传来的数据
+        //进行数据处理时会先将前端传来的数据，例如username,phone等信息拷贝至employee
+        //再将updateTime等后端数据一一赋值处理
         log.info("新增员工，员工数据：{}", employeeDTO);
         employeeService.save(employeeDTO);
         return Result.success();
@@ -88,10 +91,43 @@ public class EmployeeController {
         return Result.success(pageResult);
     }
 
+    /**
+     * 启用禁用员工
+     * @param status
+     * @param id
+     * @return
+     */
     @PostMapping("/status/{status}")
+    @ApiOperation("启用禁用员工")
     public Result startOrStop(@PathVariable Integer status,Long id){
         log.info("修改员工状态,{},{}",status,id);
         employeeService.startOrStop(status,id);
+        return Result.success();
+    }
+
+    /**
+     * 通过id查找员工信息
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("通过id查找员工信息")
+    public Result<Employee> getById(@PathVariable Long id){
+        Employee employee = employeeService.getById(id);
+        return Result.success(employee);
+    }
+
+    /**
+     * 修改员工信息
+     * @param employeeDTO
+     * @return
+     */
+    @PutMapping
+    @ApiOperation("修改员工信息")
+    public Result update(@RequestBody EmployeeDTO employeeDTO){
+        //此处的@RequestBody作用同新增，都是将前端数据传过来，不过此处是修改的数据
+        log.info("修改员工信息,{}",employeeDTO);
+        employeeService.update(employeeDTO);
         return Result.success();
     }
     /**
