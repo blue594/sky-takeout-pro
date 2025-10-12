@@ -27,4 +27,10 @@ public interface EmployeeMapper {
     // 在有模糊查询的时候可以进行模糊查询，即使没有使用任何查询也会将所有数据按创建时间降序排序，
     // 而具体分页情况（如从第几条数据开始，每页有多少数据）则由之前写的PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize())决定
     Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+
+    /**
+     * 全局或局部修改
+     * @param employee
+     */
+    void update(Employee employee);
 }
