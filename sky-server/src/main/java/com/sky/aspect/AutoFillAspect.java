@@ -54,6 +54,7 @@ public class AutoFillAspect {
         Long currentId = BaseContext.getCurrentId();
 
         //根据当前不同的操作类型，为对应的属性通过反射来赋值
+        //反射可以在不知道实体类的前提下操作方法
         if(operationType == OperationType.INSERT){
             //为4个公共字段赋值
             try {
