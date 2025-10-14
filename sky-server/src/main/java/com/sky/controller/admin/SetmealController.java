@@ -81,5 +81,15 @@ public class SetmealController {
         return Result.success();
     }
 
-
+    /**
+     * 修改套餐状态
+     * @param status
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("修改套餐状态")
+    public Result startOrStop(@PathVariable Integer status,Long id){
+        setmealService.startOrStop(status,id);
+        return Result.success();
+    }
 }
