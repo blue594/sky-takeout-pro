@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -211,5 +212,21 @@ public class DishServiceImpl implements DishService {
         }
 
         return dishVOList;
+    }
+
+    @Override
+    public Dish getById(Long id) {
+        Dish dish = dishMapper.getById(id);
+        return dish;
+    }
+
+    @Override
+    public List<Integer> getCategoryIdByDishIds(List<Long> ids) {
+        // 1. 调用Mapper查询：根据菜品ID集合，查询所有对应的categoryId
+        List<Integer> categoryIds = dishMapper.selectCategoryIdsByDishIds(ids);
+
+        // 2. 去重：如果多个菜品属于同一个分类，只保留一个categoryId
+        //    用Stream的distinct()去重，再收集为List
+        return categoryIds.stream().distinct().collect(Collectors.toList());
     }
 }

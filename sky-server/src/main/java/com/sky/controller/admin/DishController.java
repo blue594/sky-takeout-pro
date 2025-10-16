@@ -12,9 +12,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/admin/dish")
@@ -23,7 +25,8 @@ import java.util.List;
 public class DishController {
     @Autowired
     private DishService dishService;
-
+    @Autowired
+    private RedisTemplate redisTemplate;
     /**
      * 新增菜品
      * @param dishDTO
@@ -34,6 +37,9 @@ public class DishController {
     public Result save(@RequestBody DishDTO dishDTO) {
         log.info("新增菜品：{}", dishDTO);
         dishService.saveWithFlavor(dishDTO);
+        //清理缓存数据
+        String key = "dish_" + dishDTO.getCategoryId();
+        cleanCache(key);
         return Result.success();
     }
 
@@ -58,7 +64,14 @@ public class DishController {
     @DeleteMapping
     @ApiOperation("删除菜品")
     public Result delete(@RequestParam List<Long> ids){
+        //查询出选择的菜品属于的分类（由于redis中存入的单条数据是分类数据，需要把所属分类的redis数据删除重建）
+        List<Integer> categoryIds = dishService.getCategoryIdByDishIds(ids);
         dishService.delete(ids);
+        for (Integer categoryId : categoryIds) {
+            String key = "dish_" + categoryId;
+            redisTemplate.delete(key);
+        }
+
         return Result.success();
     }
 
@@ -85,6 +98,8 @@ public class DishController {
     public Result update(@RequestBody DishDTO dishDTO){
         log.info("修改菜品信息:{}",dishDTO);
         dishService.update(dishDTO);
+        String key = "dish_" + dishDTO.getCategoryId();
+        redisTemplate.delete(key);
         return Result.success();
     }
 
@@ -97,7 +112,11 @@ public class DishController {
     @PostMapping("/status/{status}")
     @ApiOperation("修改菜品状态")
     public Result startOrStop(@PathVariable Integer status,Long id){
+        Dish dish = dishService.getById(id);
+        Long categoryId = dish.getCategoryId();
         dishService.startOrStop(status,id);
+        redisTemplate.delete("dish_"+categoryId);
+        cleanCache("dish_*");
         return Result.success();
     }
 
@@ -111,4 +130,10 @@ public class DishController {
         List<Dish> dishList = dishService.list(categoryId);
         return Result.success(dishList);
     }
+
+    private void cleanCache(String pattern){
+        Set keys = redisTemplate.keys(pattern);
+        redisTemplate.delete(keys);
+    }
+
 }

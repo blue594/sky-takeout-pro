@@ -46,4 +46,12 @@
         left join setmeal_dish sd on sd.dish_id = d.id
         where sd.setmeal_id = #{id}
     </select>
+    <select id="selectCategoryIdsByDishIds" resultType="java.lang.Integer">
+        SELECT category_id
+        FROM dish
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>
