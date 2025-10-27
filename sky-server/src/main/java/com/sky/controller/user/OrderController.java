@@ -48,4 +48,50 @@ public class OrderController {
         log.info("生成预支付交易单：{}", orderPaymentVO);
         return Result.success(orderPaymentVO);
     }
+
+    /**
+     * 查看历史订单
+     * @return
+     */
+    @GetMapping("/historyOrders")
+    @ApiOperation("查看历史订单")
+    public Result<PageResult> page(int page,int pageSize,Integer status){
+        PageResult pageResult = orderService.pageQuery(page,pageSize,status);
+        return Result.success(pageResult);
+    }
+
+    /**
+     * 查询订单详情
+     * @param id
+     * @return
+     */
+    @GetMapping("/orderDetail/{id}")
+    @ApiOperation("查询订单详情")
+    public Result<OrderVO> details(@PathVariable Long id){
+        OrderVO orderVO = orderService.details(id);
+        return Result.success(orderVO);
+    }
+
+    /**
+     * 取消订单
+     * @param id
+     * @return
+     */
+    @PutMapping("/cancel/{id}")
+    public Result cancel(@PathVariable Long id){
+        orderService.userCancelById(id);
+        return Result.success();
+    }
+
+    /**
+     * 再来一单
+     * @param id
+     * @return
+     */
+    @PostMapping("repetition/{id}")
+    @ApiOperation("再来一单")
+    public Result repetition(@PathVariable Long id){
+        orderService.repetition(id);
+        return Result.success();
+    }
 }

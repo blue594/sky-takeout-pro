@@ -27,4 +27,31 @@ public interface OrderService {
      * @param outTradeNo
      */
     void paySuccess(String outTradeNo);
+
+    PageResult pageQuery(int page, int pageSize, Integer status);
+
+    OrderVO details(Long id);
+
+    void userCancelById(Long id);
+
+    void repetition(Long id);
+
+    /**
+     * 管理端订单搜索
+     * @param ordersPageQueryDTO
+     * @return
+     */
+    PageResult conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO);
+
+    OrderStatisticsVO statistics();
+
+    void confirm(OrdersConfirmDTO ordersConfirmDTO);
+
+    void reject(OrdersRejectionDTO ordersRejectionDTO);
+
+    void cancel(OrdersCancelDTO ordersCancelDTO);
+
+    void delivery(Long id);
+
+    void finish(Long id);
 }
