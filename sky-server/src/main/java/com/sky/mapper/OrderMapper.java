@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Mapper
 public interface OrderMapper {
-    Double sumByMap(Map map);
+
 
     /**
      * 插入订单数据
@@ -74,9 +74,9 @@ public interface OrderMapper {
     @Select("select * from orders where status = #{status} and order_time < #{orderTime}")
     List<Orders> getByStatusAndOrdertimeLT(Integer status, LocalDateTime orderTime);
 
-    Integer getOrderCount(LocalDateTime begin, LocalDateTime end);
-
-    Integer getValidOrderCount(Integer status, LocalDateTime begin, LocalDateTime end);
+    Double sumByMap(Map map);
 
     List<GoodsSalesDTO> getSalesTop10(LocalDateTime beginTime, LocalDateTime endTime);
+
+    Integer countByMap(Map map);
 }

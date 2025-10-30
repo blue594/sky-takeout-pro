@@ -17,6 +17,18 @@ spring:
       url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
       username: ${sky.datasource.username}
       password: ${sky.datasource.password}
+      min-evictable-idle-time-millis: 1800000  # 空闲连接保留 30 分钟（默认是 30 分钟？不同版本可能不同，手动设长点）
+      max-evictable-idle-time-millis: 2700000  # 连接最大空闲时间 45 分钟（超过则强制回收）
+      # 连接检测线程的执行间隔（毫秒），建议设置为300000（5分钟）
+      time-between-eviction-runs-millis: 300000
+      # 检测连接是否有效的SQL（MySQL可用此语句）
+      validation-query: SELECT 1
+      # 申请连接时检测连接有效性（避免获取到已失效的连接）
+      test-on-borrow: false
+      # 归还连接时检测连接有效性
+      test-on-return: false
+      # 空闲时检测连接有效性（关键：确保空闲连接未被MySQL关闭）
+      test-while-idle: true
 
 mybatis:
   #mapper配置文件
