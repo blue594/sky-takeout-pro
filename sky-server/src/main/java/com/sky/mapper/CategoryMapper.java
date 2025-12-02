@@ -30,4 +30,7 @@ public interface CategoryMapper {
     void update(Category category);
 
     List<Category> list(Integer type);
+
+    @Select("select * from category where id = #{id}")
+    Category getById(Long id);
 }

@@ -13,6 +13,7 @@ import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
 import com.sky.result.PageResult;
+import com.sky.service.GuessYouLikeService;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
@@ -23,6 +24,8 @@ import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jms.JmsProperties;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -48,6 +51,14 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private WebSocketServer webSocketServer;
 
+    @Autowired
+    private GuessYouLikeService guessYouLikeService;
+
+    @Autowired
+    private GuessYouLikeMapper guessYouLikeMapper;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 用户下单
@@ -440,8 +451,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 完成订单
-     *
-     * @return
+     * @param id
      */
     @Override
     public void finish(Long id) {
@@ -449,11 +459,47 @@ public class OrderServiceImpl implements OrderService {
         if(ordersDB == null || !ordersDB.getStatus().equals(Orders.DELIVERY_IN_PROGRESS)){
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }
+
         Orders orders = new Orders();
         orders.setId(ordersDB.getId());
         orders.setStatus(Orders.COMPLETED);
         orders.setDeliveryTime(LocalDateTime.now());
         orderMapper.update(orders);
+
+        // 订单完成后更新猜你喜欢
+        updateGuessYouLikeAfterOrderComplete(id);
+    }
+
+    /**
+     * 订单完成后更新猜你喜欢
+     * @param orderId 订单ID
+     */
+    @Override
+    public void updateGuessYouLikeAfterOrderComplete(Long orderId) {
+        // 根据订单ID查询订单信息获取用户ID
+        Orders order = orderMapper.getById(orderId);
+        if (order == null) {
+            log.error("订单不存在，订单ID：{}", orderId);
+            return;
+        }
+
+        Long userId = order.getUserId();
+        if (userId == null) {
+            log.error("订单用户ID为空，订单ID：{}", orderId);
+            return;
+        }
+
+        // 先删除用户原有的猜你喜欢数据
+        guessYouLikeMapper.deleteByUserId(userId);
+
+        // 重新初始化用户的猜你喜欢数据（会基于最新的订单记录）
+        guessYouLikeService.initOrUpdateGuessYouLike(userId);
+        log.info("订单完成后更新猜你喜欢数据，用户ID：{}，订单ID：{}", userId, orderId);
+        // 清理猜你喜欢缓存
+        String guessKey = "dish_guess_you_like_" + userId;
+        redisTemplate.delete(guessKey);
+
+        log.info("订单完成后更新猜你喜欢数据并清理缓存，用户ID：{}", userId);
     }
 
     /**
@@ -475,4 +521,6 @@ public class OrderServiceImpl implements OrderService {
         map.put("content", "订单号：" + orders.getNumber());
         webSocketServer.sendToAllClient(JSON.toJSONString(map));
     }
+
+
 }

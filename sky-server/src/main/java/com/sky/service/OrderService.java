@@ -56,4 +56,7 @@ public interface OrderService {
     void finish(Long id);
 
     void reminder(Long id);
+
+    // 更新猜你喜欢
+    void updateGuessYouLikeAfterOrderComplete(Long orderId);
 }

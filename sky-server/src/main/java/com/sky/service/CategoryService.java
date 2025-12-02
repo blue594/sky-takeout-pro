@@ -12,6 +12,8 @@ public interface CategoryService {
 
     void save(CategoryDTO categoryDTO);
 
+    Category getById(Long id);
+
     /**
      * 分类分页查询
      * @param categoryPageQueryDTO

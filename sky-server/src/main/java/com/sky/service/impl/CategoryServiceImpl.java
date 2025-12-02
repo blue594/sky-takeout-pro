@@ -101,4 +101,8 @@ public class CategoryServiceImpl implements CategoryService {
     public List<Category> list(Integer type) {
         return categoryMapper.list(type);
     }
+
+    public Category getById(Long id) {
+        return categoryMapper.getById(id);
+    }
 }
