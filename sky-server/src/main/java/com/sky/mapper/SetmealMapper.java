@@ -62,4 +62,11 @@ public interface SetmealMapper {
      * @return
      */
     Integer countByMap(Map map);
+
+    @Select("SELECT SUM(od.number) FROM order_detail od " +
+            "INNER JOIN orders o ON od.order_id = o.id " +
+            "WHERE od.setmeal_id = #{setmealId} " +
+            "AND o.status = 5 " +
+            "AND o.order_time >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)")
+    Integer getMonthSales(Long setmealId);
 }

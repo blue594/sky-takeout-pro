@@ -2,6 +2,7 @@ package com.sky.mapper;
 
 import com.sky.entity.OrderDetail;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -30,12 +31,8 @@ public interface OrderDetailMapper {
     /**
      * 统计指定状态订单中的菜品销量（按销量倒序）
      */
-    @Select("select dish_id, count(*) as sales " +
-            "from order_detail od " +
-            "left join orders o on od.order_id = o.id " +
-            "where o.status = #{status} and od.dish_id is not null " +
-            "group by dish_id " +
-            "order by sales desc")
-    List<Map<String, Object>> statisticsDishSales(Integer status);
-
+    List<Map<String, Object>> statisticsDishSales(
+            @Param("status") Integer status,
+            @Param("limit") Integer limit
+    );
 }

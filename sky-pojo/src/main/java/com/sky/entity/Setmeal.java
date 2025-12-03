@@ -39,6 +39,8 @@ public class Setmeal implements Serializable {
     //图片
     private String image;
 
+    private Integer monthSales; // 套餐月销量
+
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;

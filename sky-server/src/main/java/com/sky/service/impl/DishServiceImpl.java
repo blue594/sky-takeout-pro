@@ -206,8 +206,11 @@ public class DishServiceImpl implements DishService {
 
             //根据菜品id查询对应的口味
             List<DishFlavor> flavors = dishFlavorMapper.getByDishId(d.getId());
-
             dishVO.setFlavors(flavors);
+            // 查询月销量
+            Integer monthSales = dishMapper.getMonthSales(d.getId());
+            dishVO.setMonthSales(monthSales != null ? monthSales : 0);
+
             dishVOList.add(dishVO);
         }
 

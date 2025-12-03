@@ -24,4 +24,6 @@ public class DishItemVO implements Serializable {
 
     //菜品描述
     private String description;
+
+
 }

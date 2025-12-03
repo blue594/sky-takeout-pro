@@ -26,10 +26,4 @@ public interface GuessYouLikeMapper {
      */
     @Delete("delete from guess_you_like where user_id = #{userId}")
     void deleteByUserId(Long userId);
-
-    /**
-     * 检查用户是否已有猜你喜欢数据
-     */
-    @Select("select count(*) from guess_you_like where user_id = #{userId}")
-    Integer countByUserId(Long userId);
 }

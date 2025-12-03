@@ -43,6 +43,8 @@ public class SetmealVO implements Serializable {
     //分类名称
     private String categoryName;
 
+    private Integer monthSales; // 套餐月销量
+
     //套餐和菜品的关联关系
     private List<SetmealDish> setmealDishes = new ArrayList<>();
 }

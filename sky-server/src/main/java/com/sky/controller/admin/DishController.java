@@ -98,8 +98,14 @@ public class DishController {
     public Result update(@RequestBody DishDTO dishDTO){
         log.info("修改菜品信息:{}",dishDTO);
         dishService.update(dishDTO);
-        String key = "dish_" + dishDTO.getCategoryId();
-        redisTemplate.delete(key);
+        // 清理该菜品所属分类的缓存
+        String categoryKey = "dish_" + dishDTO.getCategoryId();
+        redisTemplate.delete(categoryKey);
+        // 额外清理所有用户的"猜你喜欢"缓存（因为月销量变化会影响推荐结果）
+        Set<String> guessKeys = redisTemplate.keys("dish_guess_you_like_*");
+        if(guessKeys != null && !guessKeys.isEmpty()){
+            redisTemplate.delete(guessKeys);
+        }
         return Result.success();
     }
 

@@ -10,4 +10,17 @@
             (#{od.name},#{od.image},#{od.orderId},#{od.dishId},#{od.setmealId},#{od.dishFlavor},#{od.number},#{od.amount})
         </foreach>
     </insert>
+
+    <select id="statisticsDishSales" resultType="java.util.Map">
+        select
+            od.dish_id,
+            sum(od.number) as sales  -- 统计菜品销售总数量
+        from order_detail od
+                 inner join orders o on od.order_id = o.id
+        where o.status = #{status}
+          and od.dish_id is not null  -- 仅统计菜品（排除套餐）
+        group by od.dish_id
+        order by sales desc
+        limit #{limit}  -- 限制返回数量
+    </select>
 </mapper>

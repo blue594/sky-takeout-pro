@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -148,8 +149,15 @@ public class SetmealServiceImpl implements SetmealService {
      * @return
      */
     public List<Setmeal> list(Setmeal setmeal) {
-        List<Setmeal> list = setmealMapper.list(setmeal);
-        return list;
+        List<Setmeal> setmealList = setmealMapper.list(setmeal);
+
+        // 为每个套餐补充月销量
+        for (Setmeal s : setmealList) {
+            Integer monthSales = setmealMapper.getMonthSales(s.getId());
+            s.setMonthSales(monthSales != null ? monthSales : 0);
+        }
+
+        return setmealList;
     }
 
     /**
@@ -158,6 +166,8 @@ public class SetmealServiceImpl implements SetmealService {
      * @return
      */
     public List<DishItemVO> getDishItemById(Long id) {
+
         return setmealMapper.getDishItemBySetmealId(id);
     }
+
 }

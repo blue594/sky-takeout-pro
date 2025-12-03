@@ -50,4 +50,12 @@ public interface DishMapper {
      * @return
      */
     Integer countByMap(Map map);
+
+    // 在DishMapper.java中添加查询月销量的方法
+    @Select("SELECT sum(od.number) FROM order_detail od " +
+            "INNER JOIN orders o ON od.order_id = o.id " +
+            "WHERE od.dish_id = #{dishId} " +
+            "AND o.status = 5 " + // 已完成订单
+            "AND o.order_time >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)")
+    Integer getMonthSales(Long dishId);
 }
